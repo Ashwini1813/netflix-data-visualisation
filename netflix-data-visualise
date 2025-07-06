@@ -1,0 +1,49 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+data=pd.read_csv('My project/netflix1.csv')
+data.head()
+data.shape
+data.columns
+data.info()
+data.describe()
+data.isnull().sum()
+data = data.dropna(subset=["title", "director", "country", "date_added"])  
+data["rating"].fillna("Not Rated", inplace=True)
+data["duration"].fillna("Unknown", inplace=True)
+data.duplicated().sum()       
+data.drop_duplicates(inplace=True)
+data["date_added"] = pd.to_datetime(data["date_added"])
+data["year_added"] = data["date_added"].dt.year
+data["month_added"] = data["date_added"].dt.month
+sns.countplot(data=data, x="type")
+plt.title("Count of Movies vs TV Shows")
+plt.show()
+data["country"].value_counts().head(10).plot(kind='barh')
+plt.title("Top 10 Countries on Netflix")
+plt.xlabel("Number of Titles")
+plt.show()
+data["year_added"].value_counts().sort_index().plot(kind='bar')
+plt.title("Content Added Over Years")
+plt.ylabel("No. of Titles")
+plt.xlabel("Year")
+plt.show()
+sns.countplot(data=data, x="rating", order=data["rating"].value_counts().index[:10])
+plt.xticks(rotation=45)
+plt.title("Top Netflix Ratings")
+plt.show()
+from collections import Counter
+
+genres = []
+for i in data["listed_in"]:
+    for genre in i.split(","):
+        genres.append(genre.strip())
+
+genre_counts = Counter(genres)
+top_genres = pd.DataFrame(genre_counts.most_common(10), columns=["Genre", "Count"])
+
+sns.barplot(data=top_genres, x="Count", y="Genre")
+plt.title("Top 10 Netflix Genres")
+plt.show()
+data.to_csv("netflix_cleaned.csv", index=False)
